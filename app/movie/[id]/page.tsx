@@ -1,4 +1,5 @@
 import MovieInfo from "@/components/movie/MovieInfo";
+import Trailer from "@/components/movie/Trailer";
 import { notFound } from "next/navigation";//
 import Image from "next/image";
 import { getMovieDetails, getSimilarMovies ,getMovieVideos, getMovieCredits} from "@/services/api";
@@ -48,7 +49,7 @@ export default async function MovieDetails({ params }: Props) {
 
           <div className="space-y-4">
             <MovieInfo movie={movie} />
-
+            <Trailer videos={videos} />
             <div className="flex flex-wrap gap-2">
               {movie.genres.map((genre: { id: number; name: string }) => (
                 <span
