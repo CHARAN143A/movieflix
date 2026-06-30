@@ -1,6 +1,7 @@
+import MovieInfo from "@/components/movie/MovieInfo";
 import { notFound } from "next/navigation";//
 import Image from "next/image";
-import { getMovieDetails } from "@/services/api";
+import { getMovieDetails, getSimilarMovies ,getMovieVideos, getMovieCredits} from "@/services/api";
 
 type Props = {
   params: Promise<{
@@ -11,7 +12,12 @@ type Props = {
 export default async function MovieDetails({ params }: Props) {
   const { id } = await params;
 
-  const movie = await getMovieDetails(id);
+  const [movie, videos, credits, similar] = await Promise.all([
+  getMovieDetails(id),
+  getMovieVideos(id),
+  getMovieCredits(id),
+  getSimilarMovies(id),
+]);
 
   if (!movie || movie.success === false) {//
   notFound();
@@ -41,13 +47,7 @@ export default async function MovieDetails({ params }: Props) {
           />
 
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold">{movie.title}</h1>
-
-            <p>⭐ {movie.vote_average.toFixed(1)}</p>
-
-            <p>📅 {movie.release_date}</p>
-
-            <p>{movie.overview}</p>
+            <MovieInfo movie={movie} />
 
             <div className="flex flex-wrap gap-2">
               {movie.genres.map((genre: { id: number; name: string }) => (
