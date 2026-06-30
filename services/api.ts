@@ -13,9 +13,12 @@ export const fetchTrendingMovies = async () => {
   return res.json();
 };
 
-export const searchMovies = async (query: string) => {
+export const searchMovies = async (
+  query: string,
+  page: number = 1
+) => {
   const res = await fetch(
-    `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`
+    `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
   );
 
   if (!res.ok) {
