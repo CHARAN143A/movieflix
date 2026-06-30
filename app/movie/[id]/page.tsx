@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";//
 import Image from "next/image";
 import { getMovieDetails } from "@/services/api";
 
@@ -11,6 +12,10 @@ export default async function MovieDetails({ params }: Props) {
   const { id } = await params;
 
   const movie = await getMovieDetails(id);
+
+  if (!movie || movie.success === false) {//
+  notFound();
+}
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
