@@ -7,9 +7,9 @@ import CastList from "@/components/movie/CastList";
 import SimilarMovies from "@/components/movie/SimilarMovies";
 
 import {
+  getMovieCredits,
   getMovieDetails,
   getMovieVideos,
-  getMovieCredits,
   getSimilarMovies,
 } from "@/services/api";
 
@@ -19,11 +19,19 @@ type Props = {
   }>;
 };
 
-export default async function MovieDetails({ params }: Props) {
+export default async function MovieDetailsPage({
+  params,
+}: Props) {
   const { id } = await params;
 
-  const [movie, videos, credits, similar] = await Promise.all([
-    getMovieDetails(id),
+const movie = await getMovieDetails(id);
+
+if (!movie) {
+  notFound();
+}
+
+const [videos, credits, similar] =
+  await Promise.all([
     getMovieVideos(id),
     getMovieCredits(id),
     getSimilarMovies(id),
@@ -35,60 +43,114 @@ export default async function MovieDetails({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      {/* Backdrop */}
-      <div className="relative h-[400px] w-full">
+
+      {/* ================= HERO ================= */}
+
+      <section className="relative h-[70vh] min-h-[550px] overflow-hidden">
+
         <Image
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
           alt={movie.title}
           fill
           priority
+          sizes="100vw"
           className="object-cover"
         />
-      </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
-        {/* Poster + Movie Details */}
-        <div className="flex flex-col gap-10 md:flex-row">
-          <Image
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            alt={movie.title}
-            width={300}
-            height={450}
-            className="rounded-xl shadow-lg"
-          />
+        {/* overlays */}
 
-          <div className="flex-1 space-y-6">
-            <MovieInfo movie={movie} />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent" />
 
-            {/* Genres */}
-            <div className="flex flex-wrap gap-2">
-              {movie.genres.map((genre: { id: number; name: string }) => (
-                <span
-                  key={genre.id}
-                  className="rounded-full bg-red-600 px-4 py-1 text-sm"
-                >
-                  {genre.name}
-                </span>
-              ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+      </section>
+
+      {/* ================= CONTENT ================= */}
+
+      <div className="mx-auto -mt-32 max-w-7xl px-6 pb-20">
+
+        <div className="flex flex-col gap-10 lg:flex-row">
+
+          {/* Poster */}
+
+        {/* ================= POSTER ================= */}
+
+<div className="flex justify-center lg:block lg:sticky lg:top-24 self-start">
+  <div className="w-[260px] sm:w-[300px] lg:w-[320px]">
+    <Image
+      src={
+        movie.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+          : "/placeholder.png"
+      }
+      alt={movie.title}
+      width={320}
+      height={480}
+      priority
+      className="
+        h-auto
+        w-full
+        rounded-3xl
+        border
+        border-white/10
+        shadow-2xl
+        shadow-black/70
+        transition-all
+        duration-500
+        hover:scale-105
+        hover:-rotate-1
+        hover:shadow-red-500/20
+      "
+    />
+  </div>
+</div>
+
+          {/* Info */}
+
+          <div className="flex-1">
+
+            <div
+              className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-white/5
+                p-8
+                backdrop-blur-xl
+              "
+            >
+              <MovieInfo movie={movie} />
             </div>
+
           </div>
+
         </div>
 
+        {/* Divider */}
+
+        <div className="my-16 border-t border-white/10" />
+
         {/* Trailer */}
-        <section className="mt-16">
-          <Trailer videos={videos} />
-        </section>
+
+        <Trailer videos={videos} />
+
+        {/* Divider */}
+
+        <div className="my-16 border-t border-white/10" />
 
         {/* Cast */}
-        <section className="mt-16">
-          <CastList credits={credits} />
-        </section>
 
-        {/* Similar Movies */}
-        <section className="mt-16">
-          <SimilarMovies movies={similar.results} />
-        </section>
+        <CastList credits={credits} />
+
+        {/* Divider */}
+
+        <div className="my-16 border-t border-white/10" />
+
+        {/* Similar */}
+
+        <SimilarMovies movies={similar.results} />
+
       </div>
+
     </main>
   );
 }
